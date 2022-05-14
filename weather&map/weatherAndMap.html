@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather&Map</title>
+    <style>
+      body {
+        height: 100vh;
+        text-transform: capitalize;
+      }
+      #cont {
+        height: 60%;
+        display: grid;
+        grid-template-columns: 50% 40%;
+        grid-gap: 3%;
+        /* border: blue solid; */
+        justify-content: center;
+        margin-top: 10%;
+        padding: 1% 1%;
+        background: linear-gradient(#ce93d8, #d500f9, #f50057, #304ffe);
+
+        font-family: sans-serif;
+      }
+      #weather {
+        display: grid;
+        grid-template-rows: 10% 40% 40%;
+        grid-gap: 2%;
+        border: blue solid 1px;
+        padding: 1% 1%;
+      }
+      #search {
+        display: flex;
+        flex-direction: row;
+        /* border: teal solid; */
+      }
+      #show {
+        /* border: blueviolet solid; */
+
+        color: black;
+      }
+      #forecast {
+        display: grid;
+        grid-template-columns: repeat(7, 12%);
+        grid-gap: 2%;
+        border: blue solid 1px;
+
+        font-size: 10px;
+        padding: 1% 1%;
+        justify-content: center;
+      }
+      #forecast > div {
+        display: grid;
+        grid-template-rows: repeat(3, 33%);
+        border: turquoise solid 1px;
+        align-content: center;
+        justify-content: center;
+      }
+      #map {
+        border: blue solid 1px;
+      }
+      img {
+        width: 40px;
+        height: 50px;
+        /* margin-bottom: 10px; */
+        align-self: center;
+      }
+      h2 {
+        text-align: center;
+        border: black solid 1px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>WeathePedia</h2>
+    <div id="cont">
+      <div id="weather">
+        <div id="search">
+          <div><input id="city" type="text" placeholder="Select City" /></div>
+          <div><button onclick="getWeatherAndMap()">Search</button></div>
+        </div>
+        <div id="show"></div>
+        <div id="forecast"></div>
+      </div>
+
+      <div id="map">
+        <iframe
+          id="if"
+          width="100%"
+          height="100%"
+          style="border: 0"
+          loading="lazy"
+          allowfullscreen
+        >
+        </iframe>
+      </div>
+    </div>
+  </body>
+</html>
+<script>
+  async function getWeatherAndMap() {
+    let city = document.getElementById("city").value;
+    console.log("city:", city);
+
+    let res1 = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=84d534320ba43f19c5cec2fa95207ca5`
+    );
+
+    // let res3 = await fetch(
+    //   `https://www.google.com/maps/embed/v1/place?key=AIzaSyChCL69Vu1TClLvQ8tE0kFjtPrc6w_rOz8&q=${city}&zoom=15`
+    // );
+
+    let data = await res1.json();
+    console.log("data:", data);
+
+  
+  let icon1 = data.weather[0].icon;
+    console.log("icon1:", icon1);
+    const iconUrl = `http://openweathermap.org/img/wn/${icon1}@2x.png`;
+    let res2 = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&cnt=7&appid=84d534320ba43f19c5cec2fa95207ca5`
+    );
+    let forecast = await res2.json();
+    console.log("forecast:", forecast);
+    console.log("forecast:", forecast.list[0].main);
+
+    // let map = await res3.json();
+    // console.log("map:", map);
+
+    // showWeatherAndMap(data, iconUrl, forecast,map);
+    showWeatherAndMap(data, iconUrl, forecast);
+
+    showMap(city);
+  }
+
+  function showWeatherAndMap(data, iconUrl, forecast) {
+    if (document.getElementById("show").innerHTML) {
+      document.getElementById("show").innerHTML = null;
+      document.getElementById("forecast").innerHTML = null;
+    }
+
+    let name = document.createElement("div");
+    name.textContent = "::" + data.name + "::";
+
+    let temp = document.createElement("div");
+    temp.textContent = "temp: " + data.main.temp + " °C";
+
+    let min_temp = document.createElement("div");
+    min_temp.textContent = "min. temp: " + data.main.temp_min + " °C";
+
+    let max_temp = document.createElement("div");
+    max_temp.textContent = "max. temp: " + data.main.temp_max + " °C";
+
+    let clouds = document.createElement("div");
+    clouds.textContent = "clouds: " + data.clouds.all;
+
+    let wind = document.createElement("div");
+    wind.textContent =
+      "wind : speed- " +
+      data.wind.speed +
+      "  deg- " +
+      data.wind.deg +
+      "  gust- " +
+      data.wind.gust;
+
+    let show = document.getElementById("show");
+    let d = document.createElement("div");
+    d.append(name, temp, min_temp, max_temp, clouds, wind);
+    show.append(d);
+
+    forecast.list.forEach(function (el) {
+      let date = document.createElement("div");
+      date.textContent = el.dt_txt.slice(0, -8);
+
+      let clouds = document.createElement("div");
+      clouds.textContent = "clouds: " + el.clouds.all;
+
+      let imgDiv = document.createElement("div");
+      let img = document.createElement("img");
+      let icon1 = el.weather[0].icon;
+      console.log("icon1:", icon1);
+      const iconUrl = `http://openweathermap.org/img/wn/${icon1}@2x.png`;
+      img.src = iconUrl;
+
+      let div = document.createElement("div");
+      div.append(date, clouds, img);
+
+      document.getElementById("forecast").append(div);
+    });
+  }
+
+  function showMap(city) {
+    //document.querySelector("map").innerHTML = null;
+    let n = document.getElementById("if");
+    n.src = `https://www.google.com/maps/embed/v1/place?key=AIzaSyChCL69Vu1TClLvQ8tE0kFjtPrc6w_rOz8&q=${city}&zoom=15`;
+
+    console.log("map:", map);
+
+    document
+      .querySelector("map")
+      .append(document.createElement("div").append(n));
+  }
+</script>
