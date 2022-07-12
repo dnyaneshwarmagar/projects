@@ -9,15 +9,16 @@
       body {
         height: 100vh;
         text-transform: capitalize;
+        background: linear-gradient(#ce93d8, #d500f9, #f50057, #304ffe);
       }
       #cont {
-        height: 60%;
+        height: 70%;
         display: grid;
         grid-template-columns: 50% 40%;
         grid-gap: 3%;
         /* border: blue solid; */
         justify-content: center;
-        margin-top: 10%;
+        margin-top: 5%;
         padding: 1% 1%;
         background: linear-gradient(#ce93d8, #d500f9, #f50057, #304ffe);
 
@@ -29,6 +30,7 @@
         grid-gap: 2%;
         border: blue solid 1px;
         padding: 1% 1%;
+        background: linear-gradient(#ce93d8, #d500f9, #f50057, #868fc7);
       }
       #search {
         display: flex;
@@ -37,7 +39,8 @@
       }
       #show {
         /* border: blueviolet solid; */
-
+        font-weight: bolder;
+        font-size: 15px;
         color: black;
       }
       #forecast {
@@ -45,10 +48,11 @@
         grid-template-columns: repeat(7, 12%);
         grid-gap: 2%;
         border: blue solid 1px;
-
-        font-size: 10px;
-        padding: 1% 1%;
+        background: linear-gradient(#ce93d8, #d500f9, #c66486, #dedfe4);
+        font-size: 20px;
+        padding: 2% 2%;
         justify-content: center;
+        font-weight: bolder;
       }
       #forecast > div {
         display: grid;
@@ -56,6 +60,7 @@
         border: turquoise solid 1px;
         align-content: center;
         justify-content: center;
+        padding: 2%;
       }
       #map {
         border: blue solid 1px;
@@ -73,12 +78,14 @@
     </style>
   </head>
   <body>
-    <h2>WeathePedia</h2>
+    <h2>WeatherPedia</h2>
     <div id="cont">
       <div id="weather">
         <div id="search">
-          <div><input id="city" type="text" placeholder="Select City" /></div>
-          <div><button onclick="getWeatherAndMap()">Search</button></div>
+          <div><input id="city" type="text" placeholder="Type City" /></div>
+          <div>
+            <button onclick="getWeatherAndMap()">Search for Results</button>
+          </div>
         </div>
         <div id="show"></div>
         <div id="forecast"></div>
@@ -114,8 +121,7 @@
     let data = await res1.json();
     console.log("data:", data);
 
-  
-  let icon1 = data.weather[0].icon;
+    let icon1 = data.weather[0].icon;
     console.log("icon1:", icon1);
     const iconUrl = `http://openweathermap.org/img/wn/${icon1}@2x.png`;
     let res2 = await fetch(
